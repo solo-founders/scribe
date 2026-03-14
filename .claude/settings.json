@@ -1,0 +1,59 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".deepwork/jobs/deepwork_rules/hooks/user_prompt_submit.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deepwork hook rules_check"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deepwork hook rules_check"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Read(./.deepwork/**)",
+      "Edit(./.deepwork/**)",
+      "Write(./.deepwork/**)",
+      "Bash(deepwork:*)",
+      "Bash(./.deepwork/jobs/deepwork_jobs/make_new_job.sh:*)",
+      "Skill(deepwork_rules)",
+      "Skill(deepwork_rules.define)",
+      "Skill(deepwork_jobs)",
+      "Skill(deepwork_jobs.define)",
+      "Skill(deepwork_jobs.review_job_spec)",
+      "Skill(deepwork_jobs.implement)",
+      "Skill(deepwork_jobs.learn)",
+      "Skill(episode_content_machine)",
+      "Skill(episode_content_machine.transcript_and_foundation)",
+      "Skill(episode_content_machine.content_mining)",
+      "Skill(episode_content_machine.pre_launch_content)",
+      "Skill(episode_content_machine.launch_content)",
+      "Skill(episode_content_machine.post_launch_content)"
+    ]
+  }
+}
