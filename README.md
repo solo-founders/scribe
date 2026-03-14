@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Scribe
 
-## Getting Started
+Scribe turns a single podcast episode into 20+ pieces of ready-to-publish content across platforms — blog posts, newsletters, social media posts, platform descriptions, quote cards, and a 14-day social calendar.
 
-First, run the development server:
+Paste a transcript, hit run, and Scribe's 5-step AI pipeline handles the rest. Each new episode builds on your past editorial decisions, learning your tone and preferences over time.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## How it works
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Paste your transcript** and guest name
+2. **Run the pipeline** — Scribe processes it through 5 phases automatically
+3. **Review and curate** — browse generated content, select your favorites, edit inline
+4. **Copy and publish** — one-click copy for each piece of content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The pipeline uses [DeepWork](https://github.com/Unsupervisedcom/deepwork)-style quality gates: each step validates its own output against strict criteria and retries if it doesn't meet the bar.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pipeline Phases
 
-## Learn More
+| Phase | What you get |
+|-------|-------------|
+| **Foundation** | 3 title options, episode description, guest bio, timestamped show notes, key topics |
+| **Content Mining** | 10+ quotable moments with timestamps, 5+ video clip suggestions, 3+ blog-worthy topics |
+| **Pre-Launch** | Teaser posts for brand + personal X accounts, newsletter teaser |
+| **Launch** | Full blog post, newsletter with subject lines, launch day social posts, YouTube/Apple/Spotify descriptions |
+| **Post-Launch** | Derivative blog posts, 14-day social media calendar, 8+ quote card texts, cross-promotion ideas |
 
-To learn more about Next.js, take a look at the following resources:
+## Editorial Memory
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Scribe learns from your past episodes. When you select, edit, or curate content, those decisions inform future pipeline runs — so your voice and preferences carry forward with each episode.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Setup
 
-## Deploy on Vercel
+1. Create a [Neon](https://neon.tech) Postgres database (free tier works)
+2. Create `.env.local`:
+   ```
+   DATABASE_URL=your_neon_connection_string
+   ANTHROPIC_API_KEY=your_anthropic_api_key
+   ```
+3. Install and run:
+   ```bash
+   npm install
+   npm run db:push
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Next.js 15** — App Router, TypeScript
+- **Tailwind CSS + shadcn/ui** — UI components
+- **Drizzle ORM + Neon Postgres** — database
+- **Claude API** — content generation with quality validation
+- **DeepWork** — rigorous prompt engineering framework

@@ -1,0 +1,163 @@
+name: episode_content_machine
+version: "1.0.0"
+summary: "Transform Solo Founders Podcast episodes into comprehensive multi-platform content"
+description: |
+  A systematic workflow for maximizing the value of each Solo Founders Podcast episode.
+  Takes a raw audio file and produces a complete content package spanning pre-launch,
+  launch day, and post-launch phases across all platforms (YouTube, podcast platforms,
+  X/Twitter, Beehiiv newsletter, Ghost blog, personal website).
+
+  Inspired by the promotional approaches of Dialectic (Jackson Dahl), Sourcery (Molly O'Shea),
+  and Founders (David Senra), this workflow follows the principle of using every part of
+  the podcast — turning one high-fidelity recording into 20+ pieces of content.
+
+  The workflow produces:
+  - Full transcript and episode foundation (title, description, guest bio, show notes)
+  - Content map with key quotes, video clip timestamps, and topic segments
+  - Pre-launch teaser content for X and newsletter
+  - Launch day blog post, newsletter edition, social posts, and platform descriptions
+  - Post-launch derivative blog posts, social media drip calendar, quote cards, and cross-promotion ideas
+
+  Designed for the Solo Founders Podcast team. All outputs are drafts for human review
+  before publishing. The podcast has ~10K X followers (plus ~25K on the host's personal account)
+  and ~9K newsletter subscribers on Beehiiv.
+
+changelog:
+  - version: "1.0.0"
+    changes: "Initial job creation with 5-step content pipeline"
+
+steps:
+  - id: transcript_and_foundation
+    name: "Transcript & Episode Foundation"
+    description: "Generate transcript from audio and create episode metadata including title, description, guest bio, and show notes"
+    instructions_file: steps/transcript_and_foundation.md
+    inputs:
+      - name: audio_file_path
+        description: "Path to the episode audio file (e.g., episodes/raw/ep01.mp3)"
+      - name: guest_name
+        description: "Name of the guest founder"
+      - name: episode_number
+        description: "Episode number (e.g., 01, 02)"
+    outputs:
+      - episodes/[episode_name]/transcript.md
+      - episodes/[episode_name]/episode_foundation.md
+    dependencies: []
+    hooks:
+      after_agent:
+        - prompt: |
+            Verify the transcript and foundation outputs:
+            1. Transcript is complete, readable, and properly formatted with speaker labels
+            2. Episode foundation includes: suggested title, description, guest bio, and show notes
+            3. Show notes include timestamps for major topic transitions
+            4. Guest bio is concise and compelling
+            If ALL criteria are met, include `<promise>Quality Criteria Met</promise>`.
+
+  - id: content_mining
+    name: "Content Mining"
+    description: "Analyze transcript to extract key quotes, video clip timestamps, topic segments, and blog-worthy moments"
+    instructions_file: steps/content_mining.md
+    inputs:
+      - file: episodes/[episode_name]/transcript.md
+        from_step: transcript_and_foundation
+      - file: episodes/[episode_name]/episode_foundation.md
+        from_step: transcript_and_foundation
+    outputs:
+      - episodes/[episode_name]/content_map.md
+    dependencies:
+      - transcript_and_foundation
+    hooks:
+      after_agent:
+        - prompt: |
+            Verify the content map:
+            1. At least 10 key quotes identified with timestamps
+            2. At least 5 video clip suggestions with start/end timestamps and suggested titles
+            3. At least 3 blog-worthy topic segments identified with descriptions
+            4. Quotes are genuinely compelling and shareable, not generic
+            5. Clip suggestions are self-contained moments that work out of context
+            If ALL criteria are met, include `<promise>Quality Criteria Met</promise>`.
+
+  - id: pre_launch_content
+    name: "Pre-Launch Content"
+    description: "Create teaser content for X (both podcast and personal accounts), newsletter teaser, and behind-the-scenes content for the days before episode launch"
+    instructions_file: steps/pre_launch_content.md
+    inputs:
+      - file: episodes/[episode_name]/content_map.md
+        from_step: content_mining
+      - file: episodes/[episode_name]/episode_foundation.md
+        from_step: transcript_and_foundation
+    outputs:
+      - episodes/[episode_name]/pre_launch/x_posts.md
+      - episodes/[episode_name]/pre_launch/newsletter_teaser.md
+    dependencies:
+      - transcript_and_foundation
+      - content_mining
+    hooks:
+      after_agent:
+        - prompt: |
+            Verify the pre-launch content:
+            1. X posts include both podcast account and personal account variants
+            2. At least 3 teaser posts with different angles (quote, topic hook, guest intro)
+            3. Newsletter teaser is concise and creates anticipation without spoiling key insights
+            4. Posts are platform-appropriate (concise for X, email-optimized for newsletter)
+            5. Each post has a clear hook in the first line
+            If ALL criteria are met, include `<promise>Quality Criteria Met</promise>`.
+
+  - id: launch_content
+    name: "Launch Day Content"
+    description: "Create full blog post for Ghost, newsletter edition for Beehiiv, launch social posts for X, and episode descriptions for YouTube and podcast platforms"
+    instructions_file: steps/launch_content.md
+    inputs:
+      - file: episodes/[episode_name]/transcript.md
+        from_step: transcript_and_foundation
+      - file: episodes/[episode_name]/content_map.md
+        from_step: content_mining
+      - file: episodes/[episode_name]/episode_foundation.md
+        from_step: transcript_and_foundation
+    outputs:
+      - episodes/[episode_name]/launch/blog_post.md
+      - episodes/[episode_name]/launch/newsletter.md
+      - episodes/[episode_name]/launch/x_posts.md
+      - episodes/[episode_name]/launch/platform_descriptions.md
+    dependencies:
+      - transcript_and_foundation
+      - content_mining
+    hooks:
+      after_agent:
+        - prompt: |
+            Verify the launch day content:
+            1. Blog post is comprehensive with embedded quotes, topic sections, and SEO-friendly structure
+            2. Newsletter edition has a compelling subject line, episode summary, key takeaways, and clear CTA to listen
+            3. X posts include announcement posts, quote posts, and thread options for both accounts
+            4. Platform descriptions are tailored (YouTube description with timestamps, podcast description for Apple/Spotify)
+            5. All content drives to the episode link
+            If ALL criteria are met, include `<promise>Quality Criteria Met</promise>`.
+
+  - id: post_launch_content
+    name: "Post-Launch Repurposing"
+    description: "Create derivative blog posts on specific topics, 2-week social media drip calendar, quote card text, and cross-promotion ideas"
+    instructions_file: steps/post_launch_content.md
+    inputs:
+      - file: episodes/[episode_name]/transcript.md
+        from_step: transcript_and_foundation
+      - file: episodes/[episode_name]/content_map.md
+        from_step: content_mining
+      - file: episodes/[episode_name]/episode_foundation.md
+        from_step: transcript_and_foundation
+    outputs:
+      - episodes/[episode_name]/post_launch/derivative_blog_posts.md
+      - episodes/[episode_name]/post_launch/social_calendar.md
+      - episodes/[episode_name]/post_launch/quote_cards.md
+      - episodes/[episode_name]/post_launch/cross_promotion.md
+    dependencies:
+      - transcript_and_foundation
+      - content_mining
+    hooks:
+      after_agent:
+        - prompt: |
+            Verify the post-launch content:
+            1. At least 2 derivative blog posts on distinct topics from the episode
+            2. Social calendar covers 14 days with specific posts scheduled (following 40/40/20 rule: educational/inspirational/promotional)
+            3. At least 8 quote cards with the quote text and suggested visual treatment
+            4. Cross-promotion ideas reference specific content from the episode
+            5. Content is varied enough to avoid repetition across the 2-week drip
+            If ALL criteria are met, include `<promise>Quality Criteria Met</promise>`.
